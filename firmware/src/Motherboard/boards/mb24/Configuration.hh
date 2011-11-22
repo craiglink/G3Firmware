@@ -41,9 +41,9 @@
 // Define as 1 if and SD card slot is present; 0 if not.
 #define HAS_SD                  1
 // The pin that connects to the write protect line on the SD header.
-#define SD_WRITE_PIN            Pin(PortD,0)
+#define SD_WRITE_PIN            Pin(PortB,7) // CRAIGBOT Pin(PortD,0)
 // The pin that connects to the card detect line on the SD header.
-#define SD_DETECT_PIN           Pin(PortD,1)
+#define SD_DETECT_PIN           Pin(PortC,4) // CRAIGBOT Pin(PortD,1)
 // The pin that connects to the chip select line on the SD header.
 #define SD_SELECT_PIN           Pin(PortB,0)
 
@@ -64,7 +64,7 @@
 
 // --- Piezo Buzzer configuration ---
 // Define as 1 if the piezo buzzer is present, 0 if not.
-#define HAS_BUZZER              1
+#define HAS_BUZZER              0 // CRAIGBOT 1
 // The pin that drives the buzzer
 #define BUZZER_PIN              Pin(PortC,6)
 
@@ -156,17 +156,17 @@
 #define DISPLAY_TYPE_DUAL 3
 
 //#define DISPLAY_TYPE DISPLAY_TYPE_NONE
-#define DISPLAY_TYPE DISPLAY_TYPE_LIQUIDCRYSTAL
+//#define DISPLAY_TYPE DISPLAY_TYPE_LIQUIDCRYSTAL
 //#define DISPLAY_TYPE DISPLAY_TYPE_MODTRONIXLCD2S
-//#define DISPLAY_TYPE DISPLAY_TYPE_DUAL
+#define DISPLAY_TYPE DISPLAY_TYPE_DUAL
 
 /// Pin mappings for the LiquidCrystal class connection.
-#define LCD_RS_PIN		Pin(PortC,4)
-#define LCD_ENABLE_PIN          Pin(PortC,3)
-#define LCD_D0_PIN		Pin(PortD,7)
-#define LCD_D1_PIN		Pin(PortG,2)
-#define LCD_D2_PIN		Pin(PortG,1)
-#define LCD_D3_PIN		Pin(PortG,0)
+#define LCD_RS_PIN		Pin(PortC,2)    // CRAIGBOT //Pin(PortC,4)
+#define LCD_ENABLE_PIN	Pin(PortC,0)    // CRAIGBOT //Pin(PortC,3)
+#define LCD_D0_PIN		Pin(PortG,0)    // CRAIGBOT //Pin(PortD,7)
+#define LCD_D1_PIN		Pin(PortL,6)    // CRAIGBOT //Pin(PortG,2)
+#define LCD_D2_PIN		Pin(PortL,4)    // CRAIGBOT //Pin(PortG,1)
+#define LCD_D3_PIN		Pin(PortL,2)    // CRAIGBOT //Pin(PortG,0)
 
 /// This is the pin mapping for the interface board. Because of the relatively
 /// high cost of using the pins in a direct manner, we will instead read the
@@ -174,7 +174,7 @@
 /// modified, the #scanButtons() function _must_ be updated to reflect this.
 ///
 /// TLDR: These are here for decoration only, actual pins defined in #scanButtons()
-#define HAS_INTERFACE_BUTTONS   1
+#define HAS_INTERFACE_BUTTONS   0
 #if HAS_INTERFACE_BUTTONS > 0
 #define INTERFACE_X+_PIN        Pin(PortL,7)
 #define INTERFACE_X-_PIN        Pin(PortL,6)
