@@ -9,6 +9,12 @@ class ModtronixLCD2S : public Display {
   uint8_t address;
   uint8_t charset;
 
+protected:
+    void write_command( uint8_t cmd );
+    void write_command( uint8_t cmd, uint8_t val );
+    void write_command( uint8_t cmd, uint8_t* data, uint8_t len );
+    void write_command( uint8_t cmd, PGM_P data, uint8_t len );
+
 public:
   ModtronixLCD2S(uint8_t addr = 0x50>>1);
 
@@ -27,13 +33,6 @@ public:
   void remember();
   void config(uint8_t display, uint8_t contrast, uint8_t brightness, uint8_t keypadio, uint8_t keypadbuzz);
   void set_base_address(uint8_t addr);
-
-  int8_t read_status();
-//  void read_status_async(asynctwi::callback_t cb);
-  char read_keypad_data();
-//  void read_keypad_data_async(asynctwi::callback_t cb);
-  uint8_t read_gpio123();
-//  void read_gpio123_async(asynctwi::callback_t cb);
 
   void backlight_on();
   void backlight_off();

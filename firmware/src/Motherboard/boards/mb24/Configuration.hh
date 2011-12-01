@@ -41,7 +41,7 @@
 // Define as 1 if and SD card slot is present; 0 if not.
 #define HAS_SD                  1
 // The pin that connects to the write protect line on the SD header.
-#define SD_WRITE_PIN            Pin(PortB,7) // CRAIGBOT Pin(PortD,0)
+#define SD_WRITE_PIN            Pin(PortC,3) // CRAIGBOT Pin(PortD,0)
 // The pin that connects to the card detect line on the SD header.
 #define SD_DETECT_PIN           Pin(PortC,4) // CRAIGBOT Pin(PortD,1)
 // The pin that connects to the chip select line on the SD header.
@@ -145,7 +145,13 @@
 // By default, debugging packets should be honored; this is made
 // configurable if we're short on cycles or EEPROM.
 // Define as 1 if debugging packets are honored; 0 if not.
-#define HONOR_DEBUG_PACKETS     1
+#define HONOR_DEBUG_PACKETS     0
+
+#define SPI_SS_PIN    Pin(PortL,0)
+#define SPI_SCK_PIN   Pin(PortB,1)
+#define SPI_MOSI_PIN  Pin(PortB,2)
+#define SPI_MISO_PIN  Pin(PortB,3)
+
 
 #define HAS_INTERFACE_BOARD     1
 #if HAS_INTERFACE_BOARD > 0
@@ -157,8 +163,9 @@
 
 //#define DISPLAY_TYPE DISPLAY_TYPE_NONE
 //#define DISPLAY_TYPE DISPLAY_TYPE_LIQUIDCRYSTAL
-//#define DISPLAY_TYPE DISPLAY_TYPE_MODTRONIXLCD2S
-#define DISPLAY_TYPE DISPLAY_TYPE_DUAL
+#define DISPLAY_TYPE DISPLAY_TYPE_MODTRONIXLCD2S
+//#define DISPLAY_TYPE DISPLAY_TYPE_DUAL
+
 
 /// Pin mappings for the LiquidCrystal class connection.
 #define LCD_RS_PIN		Pin(PortC,2)    // CRAIGBOT //Pin(PortC,4)
@@ -190,11 +197,22 @@
 #define INTERFACE_FOO_PIN       Pin(PortC,0)
 #define INTERFACE_BAR_PIN       Pin(PortL,0)
 #define INTERFACE_DEBUG_PIN     Pin(PortB,7)
+#else
+
 #endif // HAS_INTERFACE_BUTTONS > 0
 
 #else
 #define HAS_INTERFACE_BUTTONS 0
 #endif // HAS_INTERFACE_BOARD > 0
+
+#define DEBUG_TOOL_SLICE_PIN          Pin(PortC,2)
+#define DEBUG_CMD_SLICE_PIN           Pin(PortC,0)   
+#define DEBUG_HOST_SLICE_PIN          Pin(PortG,2)
+#define DEBUG_MOTHERBOARD_SLICE_PIN   Pin(PortG,0)
+#define DEBUG_MAIN_LOOP_PIN           Pin(PortC,1)
+//#define DEBUG_PACKET_PIN        Pin(PortD,7)
+#define DEBUG_QUERY_TOOL_PIN   Pin(PortD,7)
+//#define DEBUG__PIN   Pin(PortG,2)
 
 
 #endif // BOARDS_RRMBV12_CONFIGURATION_HH_
