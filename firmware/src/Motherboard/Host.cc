@@ -102,7 +102,7 @@ void runHostSlice() {
 		        }
 		        in.reset();
 	        }
-	        if (in.isFinished()) {
+	        else if (in.isFinished()) {
 		        packet_in_timeout.abort();
 		        out.reset();
         #if defined(HONOR_DEBUG_PACKETS) && (HONOR_DEBUG_PACKETS == 1)

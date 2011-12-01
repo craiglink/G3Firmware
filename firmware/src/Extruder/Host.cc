@@ -142,6 +142,7 @@ bool processQueryPacket(const InPacket& from_host, OutPacket& to_host) {
 			return true;
 		case SLAVE_CMD_TOGGLE_VALVE:
 			board.setValve((from_host.read8(2) & 0x01) != 0);
+			//TODO should this be falling thru?
 		case SLAVE_CMD_IS_TOOL_READY:
 			to_host.append8(RC_OK);
 			to_host.append8(board.getExtruderHeater().has_reached_target_temperature()?1:0);
@@ -222,6 +223,7 @@ bool processQueryPacket(const InPacket& from_host, OutPacket& to_host) {
 			to_host.append16(board.getPlatformHeater().getPIDErrorTerm());
 			to_host.append16(board.getPlatformHeater().getPIDDeltaTerm());
 			to_host.append16(board.getPlatformHeater().getPIDLastOutput());
+			return true;
 		case SLAVE_CMD_GET_MOTOR_1_RPM:
 			to_host.append8(RC_OK);
 			to_host.append32(motor.getRPMSpeed());
@@ -230,13 +232,14 @@ bool processQueryPacket(const InPacket& from_host, OutPacket& to_host) {
 			to_host.append8(RC_OK);
 			to_host.append8(motor.getSpeed());
 			return true;
-                case SLAVE_CMD_LIGHT_INDICATOR_LED:
+        case SLAVE_CMD_LIGHT_INDICATOR_LED:
 			to_host.append8(RC_OK);
-                        board.lightIndicatorLED();
+            board.lightIndicatorLED();
 			return true;
 		case SLAVE_CMD_TOGGLE_ABP:
 			board.setAutomatedBuildPlatformRunning((from_host.read8(2) & 0x01) != 0);
         	to_host.append8(RC_OK);
+			//TODO should this be falling thru?
 
 		}
 	}
@@ -249,57 +252,59 @@ void runHostSlice() {
 	UART& uart = ExtruderBoard::getBoard().getHostUART();
 	InPacket& in = uart.in;
 	OutPacket& out = uart.out;
-	if (out.isSending()) {
-		// still sending; wait until send is complete before reading new host packets.
-		return;
-	}
-	if (do_host_reset) {
-		do_host_reset = false;
-		reset();
-	}
-	if (in.isStarted() && !in.isFinished()) {
-		if (!packet_in_timeout.isActive()) {
-			// initiate timeout
-			packet_in_timeout.start(HOST_PACKET_TIMEOUT_MICROS);
-		} else if (packet_in_timeout.hasElapsed()) {
-			in.timeout();
-			uart.reset();
-		}
-	}
-	if (in.hasError()) {
-		packet_in_timeout.abort();
-		// REPORTING: report error.
-		// Reset packet quickly and start handling the next packet.
-		in.reset();
-		uart.reset();
-	}
-	if (in.isFinished()) {
+	// still sending; wait until send is complete before reading new host packets.
+	if (!out.isSending()) {
+	    if (do_host_reset) {
+		    do_host_reset = false;
+		    reset();
+	    }
+        else
+        {
+            if (in.isStarted() && !in.isFinished()) {
+		        if (!packet_in_timeout.isActive()) {
+			        // initiate timeout
+			        packet_in_timeout.start(HOST_PACKET_TIMEOUT_MICROS);
+		        } else if (packet_in_timeout.hasElapsed()) {
+			        in.timeout();
+			        uart.reset();
+		        }
+            }
+	        if (in.hasError()) {
+		        packet_in_timeout.abort();
+		        // REPORTING: report error.
+		        // Reset packet quickly and start handling the next packet.
+		        in.reset();
+		        uart.reset();
+	        }
+	        else if (in.isFinished()) {
                 out.reset();
-		const uint8_t target = in.read8(0);
-		packet_in_timeout.abort();
-		// SPECIAL CASE: we always process debug packets!
-		if (processDebugPacket(in,out)) {
-			// okay, processed
+		        const uint8_t target = in.read8(0);
+		        packet_in_timeout.abort();
+		        // SPECIAL CASE: we always process debug packets!
+		        if (processDebugPacket(in,out)) {
+			        // okay, processed
                 } else if ( (target == ExtruderBoard::getBoard().getSlaveID())
                             || (target == SLAVE_ID_BROADCAST) ) {
-			// only process packets for us
-			if (processQueryPacket(in, out)) {
-				// okay, processed
-			} else {
-				// Unrecognized command
-				out.append8(RC_CMD_UNSUPPORTED);
-			}
-		} else {
-			// Not for us-- no response
-			in.reset();
-			return;
-		}
-		in.reset();
-		if (target != SLAVE_ID_BROADCAST) {
-			uart.beginSend();
-		} else {
-			// Never directly respond to a broadcast message!
-			out.reset();
-		}
-	}
+			        // only process packets for us
+			        if (processQueryPacket(in, out)) {
+				        // okay, processed
+			        } else {
+				        // Unrecognized command
+				        out.append8(RC_CMD_UNSUPPORTED);
+			        }
+		        } else {
+			        // Not for us-- no response
+			        in.reset();
+			        return;
+		        }
+		        in.reset();
+		        if (target != SLAVE_ID_BROADCAST) {
+			        uart.beginSend();
+		        } else {
+			        // Never directly respond to a broadcast message!
+			        out.reset();
+		        }
+	        }
+        }
+    }
 }
