@@ -25,6 +25,7 @@
 #include "Timeout.hh"
 #include "Steppers.hh"
 #include "Motherboard.hh"
+#include "Host.hh"
 #include "SDCard.hh"
 #include "Eeprom.hh"
 #include "EepromMap.hh"
@@ -39,6 +40,8 @@ void reset(bool hard_reset) {
 		eeprom::init();
 		board.reset();
     }
+
+    host::resetHost();
 
     board.initInterfaceBoard();
 
@@ -65,22 +68,32 @@ int main() {
 	steppers::init(board);
 	reset(true);
 
+    //DEBUG_PACKET_PIN::setDirection(true);
+    //DEBUG_PACKET_PIN::setValue(false);
+    DEBUG_QUERY_TOOL_PIN::setDirection(true);
+    DEBUG_QUERY_TOOL_PIN::setValue(false);
+
+    DEBUG_MAIN_LOOP_PIN::setDirection(true);
+    DEBUG_MAIN_LOOP_PIN::setValue(false);
+
 	while (1) {
+
+        static bool debug = false;
+        debug = !debug;
+        DEBUG_MAIN_LOOP_PIN::setValue(debug);
 
 		// Toolhead interaction thread.
 		tool::runToolSlice();
+
 		// Host interaction thread.
 		host::runHostSlice();
+
 		// Command handling thread.
 		command::runCommandSlice();
+
 		// Motherboard slice
 		board.runMotherboardSlice();
 
-#ifdef TRACE_MAIN_LOOP_CYCLES
-        static bool debug = false;
-        debug = !debug;
-        DEBUG_PIN::setValue(debug);
-#endif
 	}
 	return 0;
 }
